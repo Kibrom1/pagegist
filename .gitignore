@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-tsc
+*.zip
+.DS_Store
+.vscode
+.idea
+coverage
+vite.config.ts.timestamp-*.mjs
