@@ -42,7 +42,7 @@ export function MessageList({
   }
 
   return (
-    <div className="messages" ref={ref}>
+    <div className="messages" ref={ref} aria-live="polite" aria-label="Conversation">
       {messages.map((m) => (
         <div key={m.id} className={`msg msg-${m.role}${m.error ? " msg-error" : ""}`}>
           {/* Human-readable role labels instead of API terms */}
@@ -59,7 +59,7 @@ export function MessageList({
                 </span>
               )
             ) : (
-              m.content
+              m.displayText || m.content
             )}
           </div>
         </div>

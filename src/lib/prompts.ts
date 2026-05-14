@@ -37,13 +37,23 @@ export type QuickAction = {
   buildUserMessage(args: { selection?: string }): string;
 };
 
+const SUMMARIZE_PROMPT = [
+  "Use only information from the page — do not add outside knowledge.",
+  "",
+  "**TL;DR:** Summarise this page in proportion to its length and complexity — one sentence for a brief page, up to a short paragraph for a long or dense one.",
+  "",
+  "**Key takeaways:** The most important points as bullets. Scale the count to match the content — 2–3 for a short page, up to 7 for a long or complex one. Each bullet should be a concrete, distinct fact, finding, or argument. Not a restatement of the TL;DR. Not vague generalisations.",
+  "",
+  "Only include this section if the page exceeds a few paragraphs:",
+  '**Key quote:** The single most representative sentence (under 20 words). Format as: > "quote"',
+].join("\n");
+
 export const QUICK_ACTIONS: readonly QuickAction[] = [
   {
     id: "summarize",
     label: "Summarize",
-    description: "TL;DR + 3–5 key points from the page.",
-    buildUserMessage: () =>
-      "TL;DR: one sentence summary of this page.\n\nKey takeaways: 3–5 bullets. Be specific to this page — no generic filler.",
+    description: "TL;DR + key takeaways, scaled to the page.",
+    buildUserMessage: () => SUMMARIZE_PROMPT,
   },
   {
     id: "explain",

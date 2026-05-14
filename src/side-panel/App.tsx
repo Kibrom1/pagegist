@@ -51,10 +51,8 @@ export function App() {
     autoSummarizedRef.current.add(page.url);
     const summarize = QUICK_ACTIONS.find((a) => a.id === "summarize");
     if (summarize) {
-      console.debug("[PageGist] auto-summarizing", page.url);
-      sendRef.current(summarize.buildUserMessage({}));
+      sendRef.current(summarize.buildUserMessage({}), "Summarize");
     }
-    // eslint-disable-next-line — sendRef/chatRef are stable refs intentionally excluded from deps
   }, [hydrated, page?.url]);
 
   const onQuickAction = useCallback(
@@ -62,7 +60,7 @@ export function App() {
       const action = QUICK_ACTIONS.find((a) => a.id === id);
       if (!action || !page || !tabId) return;
       const selection = await getSelection(tabId);
-      send(action.buildUserMessage({ selection: selection || undefined }));
+      await send(action.buildUserMessage({ selection: selection || undefined }), action.label);
     },
     [page, tabId, send],
   );

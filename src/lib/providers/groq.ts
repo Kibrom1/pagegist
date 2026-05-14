@@ -11,7 +11,8 @@ const MODELS = [
   { id: "llama-3.3-70b-versatile", label: "Llama 3.3 70B (versatile)" },
   { id: "llama-3.1-8b-instant", label: "Llama 3.1 8B (instant)" },
   { id: "mixtral-8x7b-32768", label: "Mixtral 8x7B (32K)" },
-  { id: "gemma2-9b-it", label: "Gemma 2 9B" },
+  // Gemma 2 9B omitted: its 8K context window is incompatible with the 32K
+  // page-content budget. It would silently 400 on any long article.
 ] as const;
 
 /**
@@ -22,7 +23,6 @@ const PRICING_PER_M_TOKENS: Record<string, { in: number; out: number }> = {
   "llama-3.3-70b-versatile": { in: 0.59, out: 0.79 },
   "llama-3.1-8b-instant": { in: 0.05, out: 0.08 },
   "mixtral-8x7b-32768": { in: 0.24, out: 0.24 },
-  "gemma2-9b-it": { in: 0.2, out: 0.2 },
 };
 
 export function createGroqBackend(getConfig: () => Promise<ProviderConfig>): ChatBackend {
@@ -32,10 +32,9 @@ export function createGroqBackend(getConfig: () => Promise<ProviderConfig>): Cha
     tier: "byok-free",
     defaultModel: DEFAULT_MODEL,
     supportedModels: MODELS,
-    // Conservative cap: Gemma 2 9B (the smallest supported model) has an 8K
-    // context window. Llama 3.x and Mixtral models support 32K+. We use 32K
-    // as a practical page-content ceiling that fits all models with room for
-    // system prompt, history, and response.
+    // All supported models (Llama 3.x, Mixtral) have 32K+ context windows.
+    // 32K is a practical page-content ceiling with room for system prompt,
+    // conversation history, and response.
     maxContextTokens: 32000,
 
     async availability() {

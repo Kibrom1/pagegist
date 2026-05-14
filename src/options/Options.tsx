@@ -154,8 +154,7 @@ export function Options() {
             const backend = getProvider(pid);
             const comingSoon = COMING_SOON.has(pid);
             const av = availability[pid];
-            const isChecking =
-              !comingSoon && (checkingProvider === pid || (!av && availability[pid] === undefined));
+            const isChecking = !comingSoon && (checkingProvider === pid || !av);
 
             return (
               <label

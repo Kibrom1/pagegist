@@ -13,6 +13,7 @@ export type ExtractedPage = {
   content: string;
   url: string;
   hadArticle: boolean;
+  wordCount: number;
 };
 
 function extractPage(): ExtractedPage {
@@ -26,12 +27,16 @@ function extractPage(): ExtractedPage {
   }
 
   const fallbackText = document.body?.innerText ?? "";
+  const content = (parsed?.textContent ?? fallbackText).trim();
+  const wordCount = content ? content.split(/\s+/).length : 0;
+
   return {
     title: parsed?.title || document.title || location.href,
     byline: parsed?.byline ?? undefined,
-    content: (parsed?.textContent ?? fallbackText).trim(),
+    content,
     url: location.href,
-    hadArticle: Boolean(parsed?.content && parsed.textContent && parsed.textContent.length > 200),
+    hadArticle: Boolean(parsed?.content && content && content.length > 200),
+    wordCount,
   };
 }
 

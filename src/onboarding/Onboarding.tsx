@@ -10,6 +10,7 @@ type NanoState =
 export function Onboarding() {
   const [nano, setNano] = useState<NanoState>({ kind: "checking" });
   const [groqKey, setGroqKey] = useState("");
+  const [groqKeyError, setGroqKeyError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -27,8 +28,14 @@ export function Onboarding() {
   };
 
   const saveGroq = async () => {
-    if (!groqKey.trim()) return;
-    await setProviderConfig("groq", { apiKey: groqKey.trim() });
+    const key = groqKey.trim();
+    if (!key) return;
+    if (!key.startsWith("gsk_")) {
+      setGroqKeyError("Groq keys start with gsk_ — double-check you pasted the right key.");
+      return;
+    }
+    setGroqKeyError(null);
+    await setProviderConfig("groq", { apiKey: key });
     await setActiveProviderId("groq");
     setSaved(true);
   };
@@ -86,11 +93,19 @@ export function Onboarding() {
             <input
               type="password"
               value={groqKey}
-              onChange={(e) => setGroqKey(e.target.value)}
+              onChange={(e) => {
+                setGroqKey(e.target.value);
+                setGroqKeyError(null);
+              }}
               placeholder="Paste your Groq key (starts with gsk_…)"
               autoComplete="off"
               spellCheck={false}
             />
+            {groqKeyError && (
+              <p className="error" style={{ marginTop: 6, marginBottom: 0 }}>
+                {groqKeyError}
+              </p>
+            )}
             <div className="actions">
               <a
                 className="primary"

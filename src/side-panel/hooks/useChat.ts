@@ -18,6 +18,7 @@ import { countTokens, truncateToTokens } from "../../lib/tokens";
 export type ChatMessage = Message & {
   id: string;
   error?: boolean;
+  displayText?: string;
 };
 
 export type ChatState = {
@@ -119,7 +120,7 @@ export function useChat(page: PageContext | undefined) {
   );
 
   const send = useCallback(
-    async (userText: string) => {
+    async (userText: string, displayText?: string) => {
       const { pending, messages } = stateRef.current;
       if (!page || !userText.trim() || pending) return;
 
@@ -134,7 +135,12 @@ export function useChat(page: PageContext | undefined) {
         content: truncateToTokens(page.content, effectiveBudget),
       };
 
-      const userMsg: ChatMessage = { id: newId(), role: "user", content: userText.trim() };
+      const userMsg: ChatMessage = {
+        id: newId(),
+        role: "user",
+        content: userText.trim(),
+        displayText: displayText || undefined,
+      };
       const placeholder: ChatMessage = { id: newId(), role: "assistant", content: "" };
       const baseMessages = [...messages, userMsg];
 

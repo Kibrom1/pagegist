@@ -2,9 +2,9 @@
 
 > AI marginalia for the modern web. Highlight anything on any page to get explanations, summaries, or counterarguments — without leaving the page.
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-Install-blue)](#)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](#)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Install-blue)](#chrome-web-store-link-coming-soon)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue.svg)](tsconfig.json)
 
 ---
 
@@ -57,7 +57,9 @@ PageGist is designed to leak as little of your data as physically possible.
 - **Direct API calls** — Your messages go from your browser to the AI provider you picked. We literally cannot see them.
 - **Local storage only** — Chat history, API keys, and settings live in `chrome.storage.local`. Clear anytime from the options page.
 
-The privacy policy that comes with the Chrome Web Store listing is the operative document, but the engineering choice underneath it is: build the extension so we have no infrastructure capable of seeing user data, full stop.
+Full details: [Privacy Policy](https://kibrom1.github.io/pagegist/privacy.html)
+
+The engineering choice underneath it is: build the extension so we have no infrastructure capable of seeing user data, full stop.
 
 ## Development
 
@@ -70,7 +72,7 @@ The privacy policy that comes with the Chrome Web Store listing is the operative
 ### Setup
 
 ```bash
-git clone https://github.com/[your-user]/pagegist.git
+git clone https://github.com/Kibrom1/pagegist.git
 cd pagegist
 pnpm install
 pnpm dev
@@ -139,7 +141,6 @@ Most providers use the OpenAI chat-completions schema — there's a `streamOpenA
 
 ```bash
 pnpm test          # Vitest unit tests
-pnpm test:e2e      # Playwright end-to-end
 pnpm typecheck     # tsc --noEmit
 pnpm lint          # Biome
 ```
@@ -148,7 +149,7 @@ pnpm lint          # Biome
 
 PageGist is in early development. Bug reports and PRs welcome.
 
-- **Bug reports** — [GitHub Issues](#) with reproduction steps
+- **Bug reports** — [GitHub Issues](https://github.com/Kibrom1/pagegist/issues) with reproduction steps
 - **Feature requests** — Open an issue tagged `enhancement` first to discuss before opening a PR
 - **PRs** — Match the existing code style (Biome enforces this); include tests for new providers
 

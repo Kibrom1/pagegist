@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — PageGist</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fff;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+
+    a { color: #0066cc; }
+    a:hover { text-decoration: none; }
+
+    header { margin-bottom: 48px; }
+
+    .wordmark {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #1a1a1a;
+      text-decoration: none;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-top: 48px;
+      margin-bottom: 8px;
+    }
+
+    .meta {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 40px;
+      margin-bottom: 10px;
+    }
+
+    p { margin-bottom: 16px; }
+
+    ul {
+      padding-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    ul li { margin-bottom: 6px; }
+
+    .highlight {
+      background: #f0f7ff;
+      border-left: 3px solid #0066cc;
+      padding: 16px 20px;
+      border-radius: 0 6px 6px 0;
+      margin: 32px 0;
+    }
+
+    .highlight p { margin: 0; }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 0.875rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="wordmark" href="https://github.com/Kibrom1/pagegist">PageGist</a>
+  </header>
+
+  <h1>Privacy Policy</h1>
+  <p class="meta">Effective date: May 2026 &nbsp;·&nbsp; Version 1.0</p>
+
+  <div class="highlight">
+    <p><strong>Short version:</strong> PageGist has no backend. We cannot see your conversations, your API keys, or your browsing activity. Everything stays in your browser.</p>
+  </div>
+
+  <h2>What PageGist stores locally</h2>
+  <p>The following data is stored only in <code>chrome.storage.local</code> on your device and is never transmitted to us:</p>
+  <ul>
+    <li>Your provider preference — which AI backend you have selected (e.g., Gemini Nano, Groq, Anthropic)</li>
+    <li>Your API keys, if you provide them — stored with obfuscation and never sent anywhere except the AI provider you choose</li>
+    <li>Your chat history, keyed to the URL of each page — retained locally until you clear it from the settings page</li>
+    <li>Your settings preferences (token counter visibility, page budget, etc.)</li>
+  </ul>
+
+  <h2>What PageGist sends to third parties</h2>
+  <p>When you ask a question or trigger a quick action, PageGist sends the following directly from your browser to the AI provider you have selected:</p>
+  <ul>
+    <li>The extracted text content of the current web page (via Mozilla Readability)</li>
+    <li>Your message and any prior conversation turns in the current session</li>
+  </ul>
+  <p>PageGist does not pass through, proxy, log, or inspect these requests. The call goes directly from your browser to the provider (Chrome Nano on-device, Groq, Anthropic, OpenAI, Google, OpenRouter, or your local Ollama instance). That provider's own privacy policy applies to any data you send them.</p>
+
+  <h2>What PageGist does not do</h2>
+  <ul>
+    <li>We do not operate a backend server of any kind</li>
+    <li>We do not collect analytics, telemetry, or usage statistics</li>
+    <li>We do not track which pages you visit or what you read</li>
+    <li>We do not sell, share, or monetise your data in any form</li>
+    <li>We do not access, read, or transmit the contents of other browser tabs</li>
+  </ul>
+
+  <h2>API keys</h2>
+  <p>If you provide an API key for a third-party provider, that key is stored locally with obfuscation (XOR-encoded, keyed to your extension install ID) so it is not readable as plain text in browser developer tools. The key is only ever transmitted to the specific provider it belongs to — it is never sent to PageGist or any other service.</p>
+
+  <h2>On-device AI (Gemini Nano)</h2>
+  <p>When you use the Chrome built-in Gemini Nano option, all inference runs entirely on your device. No data leaves your machine for AI processing.</p>
+
+  <h2>Chat history</h2>
+  <p>Conversations are stored locally in <code>chrome.storage.local</code>, keyed to a SHA-256 hash of the page URL. To delete your history, open the PageGist side panel and click the clear (⌫) button, or use the "Reset all data" option in settings.</p>
+
+  <h2>Permissions</h2>
+  <p>PageGist requests the following Chrome permissions:</p>
+  <ul>
+    <li><strong>activeTab / scripting</strong> — to extract the readable text from the current page</li>
+    <li><strong>storage</strong> — to save your settings and conversation history locally</li>
+    <li><strong>sidePanel</strong> — to display the chat interface in Chrome's side panel</li>
+  </ul>
+  <p>PageGist does not request permissions to access your browsing history, bookmarks, cookies, or other extensions.</p>
+
+  <h2>Children</h2>
+  <p>PageGist is not directed at children under the age of 13. We do not knowingly collect personal data from children.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If we make material changes to this policy, we will update the effective date above and post the updated version at this URL. We will not retroactively weaken privacy protections without notice.</p>
+
+  <h2>Contact</h2>
+  <p>Questions or concerns? Open an issue on <a href="https://github.com/Kibrom1/pagegist/issues">GitHub</a>.</p>
+
+  <footer>
+    <p>PageGist &nbsp;·&nbsp; <a href="https://github.com/Kibrom1/pagegist">GitHub</a> &nbsp;·&nbsp; No backend. No telemetry. No tracking.</p>
+  </footer>
+
+</body>
+</html>

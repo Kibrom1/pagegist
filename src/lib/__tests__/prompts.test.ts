@@ -104,9 +104,35 @@ describe("QUICK_ACTIONS", () => {
     // biome-ignore lint/style/noNonNullAssertion: test — action is guaranteed to exist
     const action = QUICK_ACTIONS.find((a) => a.id === "summarize")!;
 
-    it("builds a user message regardless of selection", () => {
+    it("builds a non-empty message", () => {
       expect(action.buildUserMessage({})).toBeTruthy();
-      expect(action.buildUserMessage({ selection: "some text" })).toBeTruthy();
+    });
+
+    it("returns the same prompt regardless of arguments", () => {
+      expect(action.buildUserMessage({})).toBe(action.buildUserMessage({ selection: "anything" }));
+    });
+
+    it("instructs the model to use only page content", () => {
+      expect(action.buildUserMessage({})).toContain("only information from the page");
+    });
+
+    it("asks for a TL;DR scaled to page length", () => {
+      const msg = action.buildUserMessage({});
+      expect(msg).toContain("TL;DR");
+      expect(msg).toContain("proportion to its length");
+    });
+
+    it("asks for key takeaways with explicit count range", () => {
+      const msg = action.buildUserMessage({});
+      expect(msg).toContain("Key takeaways");
+      expect(msg).toContain("2–3 for a short page");
+      expect(msg).toContain("up to 7 for a long");
+    });
+
+    it("requests a key quote only for longer pages", () => {
+      const msg = action.buildUserMessage({});
+      expect(msg).toContain("Key quote");
+      expect(msg).toContain("Only include this section if the page exceeds a few paragraphs");
     });
   });
 

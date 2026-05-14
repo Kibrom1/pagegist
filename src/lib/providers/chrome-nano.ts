@@ -6,11 +6,10 @@ import { ProviderError } from "./types";
 // `LanguageModel` is the Chrome 138+ entry point. Older builds expose
 // it under `window.ai.languageModel`. We check both shapes at runtime.
 //
-// API note: Chrome 138 changed the language fields from singular strings
-// (expectedOutputLanguage / outputLanguage) to plural arrays
-// (expectedInputLanguages / expectedOutputLanguages). The old field names
-// are silently ignored, which triggers the "No output language was specified"
-// console warning. We use the new plural-array names throughout.
+// API note: Chrome 138 moved language fields from singular strings
+// (expectedOutputLanguage) to plural arrays (expectedOutputLanguages).
+// The old singular names are silently ignored and trigger a console warning —
+// we use only the new plural-array names.
 type LanguageModelGlobal = {
   availability(opts?: {
     expectedInputLanguages?: string[];
@@ -28,10 +27,16 @@ type LanguageModelGlobal = {
 };
 
 // Language options are set at session-creation time (create()); promptStreaming
-// no longer accepts per-call language overrides in the Chrome 138+ API.
+// may accept overrides in some builds.
 type LanguageModelSession = {
-  prompt(input: string, opts?: { signal?: AbortSignal }): Promise<string>;
-  promptStreaming(input: string, opts?: { signal?: AbortSignal }): ReadableStream<string>;
+  prompt(
+    input: string,
+    opts?: { signal?: AbortSignal; expectedOutputLanguage?: string },
+  ): Promise<string>;
+  promptStreaming(
+    input: string,
+    opts?: { signal?: AbortSignal; expectedOutputLanguage?: string },
+  ): ReadableStream<string>;
   destroy(): void;
 };
 
@@ -128,6 +133,7 @@ export const chromeNano: ChatBackend = {
     try {
       const stream = session.promptStreaming(lastUser.content, {
         signal: opts?.signal,
+        expectedOutputLanguage: "en",
       });
       const reader = stream.getReader();
       let accumulated = "";
