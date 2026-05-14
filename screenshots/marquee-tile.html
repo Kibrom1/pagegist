@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PageGist — Marquee Promo Tile 1400×560</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 20px; gap: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .label { color: #666; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .hint  { color: #444; font-size: 11px; }
+
+  /* ── Tile ── */
+  .tile {
+    width: 1400px;
+    height: 560px;
+    background: #0f172a;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Grid */
+  .tile::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Big glow left */
+  .glow-l {
+    position: absolute;
+    width: 700px; height: 700px;
+    top: -200px; left: -100px;
+    background: radial-gradient(circle, rgba(59,130,246,0.13) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+  /* Glow right */
+  .glow-r {
+    position: absolute;
+    width: 500px; height: 500px;
+    bottom: -150px; right: 240px;
+    background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+
+  /* Left copy block */
+  .copy {
+    position: absolute;
+    left: 96px; top: 0; bottom: 0;
+    width: 560px;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .logo-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 32px;
+  }
+  .logo-icon {
+    width: 48px; height: 48px; background: #3b82f6; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .logo-icon::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  }
+  .logo-name {
+    font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #f8fafc;
+  }
+
+  .headline {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: #f8fafc;
+    margin-bottom: 20px;
+  }
+  .headline em { font-style: normal; color: #60a5fa; }
+
+  .sub {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #64748b;
+    margin-bottom: 36px;
+    max-width: 460px;
+  }
+
+  .pill-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill {
+    font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 99px;
+    color: #93c5fd; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+  }
+  .pill.green {
+    color: #6ee7b7; background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.2);
+  }
+
+  /* Right: browser mockup */
+  .browser {
+    position: absolute;
+    right: -20px; top: 40px; bottom: 40px;
+    width: 720px;
+    background: #1e293b;
+    border-radius: 12px 0 0 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-right: none;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .browser-chrome {
+    height: 36px; background: #1a2332;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; padding: 0 14px; gap: 8px;
+  }
+  .bc-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .bc-bar {
+    flex: 1; height: 18px; background: rgba(255,255,255,0.05);
+    border-radius: 9px; margin: 0 8px;
+    display: flex; align-items: center; padding: 0 10px;
+    font-size: 10px; color: rgba(255,255,255,0.2);
+  }
+  .browser-body {
+    flex: 1; display: flex; overflow: hidden;
+  }
+
+  /* Article side */
+  .article-side {
+    flex: 1; padding: 32px 36px; overflow: hidden;
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+  .art-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #3b82f6; margin-bottom: 8px;
+  }
+  .art-h { font-size: 20px; font-weight: 700; color: #e2e8f0; line-height: 1.25; margin-bottom: 10px; letter-spacing: -0.02em; }
+  .art-byline { font-size: 10px; color: rgba(255,255,255,0.25); margin-bottom: 16px; }
+  .art-p { font-size: 12px; line-height: 1.7; color: rgba(255,255,255,0.35); margin-bottom: 10px; }
+  .art-highlight {
+    background: rgba(59,130,246,0.15);
+    border-bottom: 1.5px solid #3b82f6;
+    color: rgba(255,255,255,0.6);
+    border-radius: 2px;
+  }
+
+  /* Side panel */
+  .panel-side {
+    width: 240px; flex-shrink: 0;
+    background: #0f172a;
+    display: flex; flex-direction: column;
+  }
+  .ps-header {
+    padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ps-title { font-size: 11px; font-weight: 700; color: #e2e8f0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ps-badge { font-size: 9px; padding: 2px 7px; border-radius: 99px; background: rgba(59,130,246,0.15); color: #93c5fd; }
+  .ps-actions {
+    padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; gap: 5px; flex-wrap: wrap;
+  }
+  .ps-btn {
+    font-size: 9px; padding: 4px 9px; border-radius: 99px;
+    background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .ps-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+  .ps-msgs {
+    flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden;
+  }
+  .ps-user {
+    align-self: flex-end;
+    background: #3b82f6; color: #fff;
+    border-radius: 8px 8px 2px 8px;
+    padding: 5px 9px; font-size: 9px;
+  }
+  .ps-ai {
+    align-self: flex-start; width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px 8px 8px 2px;
+    padding: 7px 9px; font-size: 9px; color: rgba(255,255,255,0.55); line-height: 1.55;
+  }
+  .ps-ai strong { color: rgba(255,255,255,0.8); }
+  .ps-ai ul { padding-left: 12px; margin-top: 4px; }
+  .ps-ai li { margin-bottom: 3px; }
+  .ps-composer {
+    padding: 8px 10px; border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; gap: 5px; align-items: center;
+  }
+  .ps-input {
+    flex: 1; height: 26px; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+    font-size: 9px; color: rgba(255,255,255,0.2); padding: 0 8px;
+    display: flex; align-items: center;
+  }
+  .ps-send {
+    width: 26px; height: 26px; background: #3b82f6; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<span class="label">Marquee promo tile — 1400 × 560 — DevTools device toolbar → ⌘⇧P → Capture screenshot</span>
+
+<div class="tile">
+  <div class="glow-l"></div>
+  <div class="glow-r"></div>
+
+  <!-- Left copy -->
+  <div class="copy">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position:relative;z-index:1;">
+          <path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"/>
+        </svg>
+      </div>
+      <span class="logo-name">PageGist</span>
+    </div>
+
+    <div class="headline">Think deeper<br/>about what<br/>you <em>read.</em></div>
+
+    <p class="sub">Highlight any text to get explanations, summaries, and counterarguments — right next to the page.</p>
+
+    <div class="pill-row">
+      <span class="pill green">Free on-device AI</span>
+      <span class="pill">No signup</span>
+      <span class="pill">No backend</span>
+      <span class="pill">BYOK</span>
+    </div>
+  </div>
+
+  <!-- Browser mockup -->
+  <div class="browser">
+    <div class="browser-chrome">
+      <div class="bc-dot" style="background:#ef4444;"></div>
+      <div class="bc-dot" style="background:#f59e0b;margin-left:4px;"></div>
+      <div class="bc-dot" style="background:#22c55e;margin-left:4px;"></div>
+      <div class="bc-bar">theatlantic.com/technology/2025/the-case-against-ai-optimism</div>
+    </div>
+    <div class="browser-body">
+      <div class="article-side">
+        <div class="art-label">Technology · Opinion</div>
+        <div class="art-h">The Case Against AI Optimism</div>
+        <div class="art-byline">By Sarah Chen &nbsp;·&nbsp; The Atlantic &nbsp;·&nbsp; April 2025</div>
+        <div class="art-p">For years, technologists have promised that artificial intelligence would solve humanity's most pressing problems — from climate change to cancer to poverty.</div>
+        <div class="art-p"><span class="art-highlight">By convincing policymakers that AI is on the cusp of transformative breakthroughs, technologists are displacing urgency from interventions that we know work.</span></div>
+        <div class="art-p" style="opacity:0.6;">Consider the healthcare domain. AI diagnostic tools have been celebrated as the future of medicine. Yet a 2024 meta-analysis found that accuracy degrades significantly in real clinical environments.</div>
+      </div>
+      <div class="panel-side">
+        <div class="ps-header">
+          <span class="ps-title">The Case Against AI Optimism</span>
+          <span class="ps-badge">Groq</span>
+        </div>
+        <div class="ps-actions">
+          <span class="ps-btn">📄 Summarize</span>
+          <span class="ps-btn">💡 Explain</span>
+          <span class="ps-btn active">⚖️ Counter</span>
+        </div>
+        <div class="ps-msgs">
+          <div class="ps-user">Counterarguments</div>
+          <div class="ps-ai">
+            <strong>3 strongest counterarguments:</strong>
+            <ul>
+              <li>Scale has produced real breakthroughs — AlphaFold solved a 50-year problem.</li>
+              <li>Deployment failures reflect infra problems, not model limits.</li>
+              <li>Optimism attracts capital to hard problems even when timelines slip.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ps-composer">
+          <div class="ps-input">Ask a follow-up…</div>
+          <div class="ps-send">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<span class="hint">DevTools → device toolbar → set to 1400×560 → ⌘⇧P → "Capture screenshot"</span>
+
+</body>
+</html>

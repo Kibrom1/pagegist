@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PageGist — Promo Tile 440×280</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d1117; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; gap: 24px; }
+  .label { color: #666; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .hint { color: #444; font-size: 11px; margin-top: 8px; }
+
+  /* ── Tile ────────────────────────────────── */
+  .tile {
+    width: 440px;
+    height: 280px;
+    background: #0f172a;
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* Subtle grid lines */
+  .tile::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Blue glow top-right */
+  .tile::after {
+    content: "";
+    position: absolute;
+    width: 320px; height: 320px;
+    top: -120px; right: -80px;
+    background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .tile-inner {
+    position: relative; z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 40px;
+    justify-content: space-between;
+  }
+
+  /* Logo row */
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: #3b82f6;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-icon svg { width: 20px; height: 20px; }
+  .logo-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #f8fafc;
+  }
+
+  /* Tagline */
+  .tagline {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: #f8fafc;
+    max-width: 280px;
+  }
+  .tagline em {
+    font-style: normal;
+    color: #60a5fa;
+  }
+
+  /* Pill row */
+  .pill-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 5px 12px;
+    border-radius: 99px;
+    color: #93c5fd;
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.25);
+    white-space: nowrap;
+  }
+  .pill.free {
+    color: #6ee7b7;
+    background: rgba(16,185,129,0.1);
+    border-color: rgba(16,185,129,0.25);
+  }
+
+  /* Mini panel sketch — right side */
+  .mini-panel {
+    position: absolute;
+    right: -4px;
+    top: 20px;
+    bottom: 20px;
+    width: 152px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px 0 0 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .mp-header {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .mp-dot { width: 5px; height: 5px; border-radius: 50%; background: #3b82f6; }
+  .mp-title { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.5); flex: 1; }
+  .mp-badge { font-size: 8px; padding: 1px 5px; border-radius: 99px; background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .mp-actions {
+    padding: 7px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; gap: 4px;
+  }
+  .mp-btn {
+    font-size: 8px; padding: 3px 7px; border-radius: 99px;
+    background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 3px;
+  }
+  .mp-messages { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+  .mp-bubble-user {
+    align-self: flex-end;
+    background: #3b82f6;
+    border-radius: 7px 7px 2px 7px;
+    padding: 4px 7px;
+    font-size: 8px; color: #fff;
+    max-width: 90%;
+  }
+  .mp-bubble-ai {
+    align-self: flex-start;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 7px 7px 7px 2px;
+    padding: 5px 7px;
+    font-size: 7.5px; color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+    width: 100%;
+  }
+  .mp-bubble-ai strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+  .mp-line { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); margin: 2px 0; }
+  .mp-composer {
+    padding: 6px 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; gap: 4px; align-items: center;
+  }
+  .mp-input {
+    flex: 1; height: 20px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+    font-size: 7px; color: rgba(255,255,255,0.2);
+    padding: 0 6px; display: flex; align-items: center;
+  }
+  .mp-send {
+    width: 20px; height: 20px; background: #3b82f6; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 9px;
+  }
+</style>
+</head>
+<body>
+
+<span class="label">Promo tile — 440 × 280 — screenshot with DevTools at exact size</span>
+
+<div class="tile">
+  <div class="tile-inner">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"/>
+        </svg>
+      </div>
+      <span class="logo-name">PageGist</span>
+    </div>
+
+    <div class="tagline">AI marginalia<br/>for the <em>modern web</em></div>
+
+    <div class="pill-row">
+      <span class="pill free">Free on-device</span>
+      <span class="pill">No signup</span>
+      <span class="pill">BYOK</span>
+      <span class="pill">No backend</span>
+    </div>
+  </div>
+
+  <!-- Mini panel on the right -->
+  <div class="mini-panel">
+    <div class="mp-header">
+      <div class="mp-dot"></div>
+      <span class="mp-title">How LLMs Work</span>
+      <span class="mp-badge">Nano</span>
+    </div>
+    <div class="mp-actions">
+      <div class="mp-btn">
+        <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h3.75M9 15h3.75"/></svg>
+        Summarize
+      </div>
+      <div class="mp-btn">💡 Explain</div>
+    </div>
+    <div class="mp-messages">
+      <div class="mp-bubble-user">Counterarguments</div>
+      <div class="mp-bubble-ai">
+        <strong>Key points:</strong>
+        <div class="mp-line" style="width:95%"></div>
+        <div class="mp-line" style="width:80%"></div>
+        <div class="mp-line" style="width:88%"></div>
+      </div>
+    </div>
+    <div class="mp-composer">
+      <div class="mp-input">Ask about this page…</div>
+      <div class="mp-send">↑</div>
+    </div>
+  </div>
+</div>
+
+<span class="hint">In DevTools: toggle device toolbar → set to 440×280 → ⌘⇧P → "Capture screenshot"</span>
+
+</body>
+</html>
