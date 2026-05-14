@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PageGist",
   "version": "0.1.0",
-  "description": "AI marginalia for the modern web. Summarize, explain, and question any page.",
+  "description": "An AI reading companion that helps you understand any web page — ask questions, get summaries, and explore ideas without leaving the page.",
   "minimum_chrome_version": "138",
   "permissions": [
     "sidePanel",
