@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QUICK_ACTIONS, type QuickActionId } from "../lib/prompts";
 import { getSettings } from "../lib/storage";
 import { ChatPanel } from "./components/ChatPanel";
+import { Icon } from "./components/Icon";
 import { ProviderBadge } from "./components/ProviderBadge";
 import { QuickActions } from "./components/QuickActions";
 import { useChat } from "./hooks/useChat";
@@ -77,7 +78,7 @@ export function App() {
         <h1 title={page?.url}>{headerTitle}</h1>
         <ProviderBadge />
         <button type="button" onClick={refresh} title="Re-read page" aria-label="Re-read page">
-          ↻
+          <Icon name="refresh" size={15} />
         </button>
         <button
           type="button"
@@ -86,10 +87,10 @@ export function App() {
           aria-label="Clear conversation"
           className="btn-danger"
         >
-          ⌫
+          <Icon name="trash" size={15} />
         </button>
         <button type="button" onClick={openOptions} title="Settings" aria-label="Open settings">
-          ⚙
+          <Icon name="settings" size={15} />
         </button>
       </header>
 

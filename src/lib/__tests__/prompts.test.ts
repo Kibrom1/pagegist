@@ -116,10 +116,11 @@ describe("QUICK_ACTIONS", () => {
       expect(action.buildUserMessage({})).toContain("only information from the page");
     });
 
-    it("asks for a TL;DR scaled to page length", () => {
+    it("asks for an unlabelled opening summary scaled to page length", () => {
       const msg = action.buildUserMessage({});
-      expect(msg).toContain("TL;DR");
-      expect(msg).toContain("proportion to its length");
+      expect(msg).toContain("proportion to");
+      expect(msg).not.toContain("TL;DR");
+      expect(msg).toContain("No label or heading");
     });
 
     it("asks for key takeaways with explicit count range", () => {

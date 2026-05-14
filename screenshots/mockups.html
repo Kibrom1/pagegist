@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PageGist — CWS Screenshot Mockups</title>
+<style>
+  /* ── Navigation ─────────────────────────────────────────────── */
+  body { margin: 0; background: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  #nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #0f0f1a; border-bottom: 1px solid #333;
+    display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+  }
+  #nav span { color: #aaa; font-size: 12px; margin-right: 8px; }
+  #nav button {
+    background: #2a2a3e; color: #ccc; border: 1px solid #444;
+    border-radius: 6px; padding: 6px 14px; font-size: 12px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  #nav button:hover, #nav button.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+  #nav .hint { margin-left: auto; color: #666; font-size: 11px; }
+
+  /* ── Screen container ───────────────────────────────────────── */
+  .screens { padding-top: 44px; }
+  .screen { display: none; width: 1280px; height: 800px; overflow: hidden; position: relative; }
+  .screen.active { display: block; }
+
+  /* ── Design tokens (matches real extension) ──────────────────── */
+  :root {
+    --pg-bg-primary: #ffffff;
+    --pg-bg-secondary: #f9fafb;
+    --pg-bg-tertiary: #f3f4f6;
+    --pg-fg-primary: #111827;
+    --pg-fg-secondary: #4b5563;
+    --pg-fg-muted: #9ca3af;
+    --pg-accent: #3b82f6;
+    --pg-accent-dark: #2563eb;
+    --pg-accent-soft: rgba(59,130,246,0.08);
+    --pg-border: #e5e7eb;
+    --pg-radius-sm: 6px;
+    --pg-radius-md: 10px;
+    --pg-radius-lg: 16px;
+    --pg-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* ── Fake Chrome OS chrome ───────────────────────────────────── */
+  .chrome-frame {
+    width: 1280px; height: 800px;
+    background: #dee1e6;
+    display: flex; flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .chrome-tabs {
+    height: 38px; background: #dee1e6;
+    display: flex; align-items: flex-end; padding: 0 8px; gap: 2px;
+  }
+  .chrome-tab {
+    height: 32px; min-width: 180px; max-width: 240px;
+    background: #f1f3f4; border-radius: 8px 8px 0 0;
+    display: flex; align-items: center; padding: 0 12px; gap: 8px;
+    font-size: 12px; color: #3c4043; position: relative;
+  }
+  .chrome-tab.active { background: #fff; }
+  .chrome-tab .favicon {
+    width: 14px; height: 14px; border-radius: 2px;
+    background: #3b82f6; flex-shrink: 0;
+  }
+  .chrome-tab .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chrome-tab .tab-close {
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #9aa0a6; font-size: 10px; flex-shrink: 0;
+  }
+  .chrome-tab-inactive {
+    height: 28px; min-width: 160px;
+    background: #c9cdd3; border-radius: 8px 8px 0 0;
+    display: flex; align-items: center; padding: 0 12px; gap: 8px;
+    font-size: 12px; color: #5f6368;
+  }
+  .chrome-tab-inactive .favicon { width: 14px; height: 14px; border-radius: 2px; background: #9aa0a6; }
+
+  .chrome-toolbar {
+    height: 40px; background: #f1f3f4;
+    display: flex; align-items: center; padding: 0 12px; gap: 8px;
+    border-bottom: 1px solid #dadce0;
+  }
+  .chrome-nav-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #5f6368; font-size: 14px; cursor: default;
+  }
+  .chrome-nav-btn.disabled { opacity: 0.35; }
+  .chrome-omnibox {
+    flex: 1; height: 28px; background: #fff;
+    border: 1px solid #dadce0; border-radius: 14px;
+    display: flex; align-items: center; padding: 0 12px; gap: 6px;
+    font-size: 13px; color: #202124;
+  }
+  .chrome-omnibox .lock { color: #5f6368; font-size: 11px; }
+  .chrome-omnibox .url { color: #202124; }
+  .chrome-extensions { display: flex; align-items: center; gap: 4px; padding: 0 4px; }
+  .chrome-ext-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: default; font-size: 13px; color: #5f6368;
+  }
+  .chrome-ext-icon.active {
+    background: rgba(59,130,246,0.12); color: #3b82f6;
+  }
+  .chrome-profile {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #3b82f6; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+  }
+
+  .chrome-content-area {
+    flex: 1; display: flex; overflow: hidden;
+  }
+
+  /* ── Article pane ────────────────────────────────────────────── */
+  .article-pane {
+    flex: 1; background: #fff;
+    overflow: hidden; position: relative;
+  }
+  .article-scroll {
+    height: 100%; overflow: hidden;
+    padding: 48px 80px; max-width: 860px; margin: 0 auto;
+    font-family: Georgia, "Times New Roman", serif;
+  }
+  .article-kicker { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #3b82f6; margin-bottom: 12px; }
+  .article-headline { font-size: 32px; line-height: 1.2; font-weight: 700; color: #111; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .article-byline { font-size: 13px; color: #777; margin-bottom: 32px; font-family: -apple-system, sans-serif; }
+  .article-body p { font-size: 18px; line-height: 1.75; color: #222; margin-bottom: 24px; }
+  .article-body strong { font-weight: 700; }
+  .highlight-selection {
+    background: rgba(59,130,246,0.18);
+    border-bottom: 2px solid #3b82f6;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .article-divider { border: none; border-top: 1px solid #e5e7eb; margin: 32px 0; }
+
+  /* ── PageGist side panel ─────────────────────────────────────── */
+  .side-panel {
+    width: 400px; flex-shrink: 0;
+    background: var(--pg-bg-primary);
+    border-left: 1px solid #dadce0;
+    display: flex; flex-direction: column;
+    font-family: var(--pg-font);
+    font-size: 14px;
+    color: var(--pg-fg-primary);
+  }
+  .pg-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; border-bottom: 1px solid var(--pg-border);
+    background: rgba(255,255,255,0.8); backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 10; flex-shrink: 0;
+  }
+  .pg-header h1 {
+    font-size: 15px; font-weight: 700; margin: 0; flex: 1;
+    letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--pg-fg-primary);
+  }
+  .pg-header-btn {
+    background: var(--pg-bg-secondary); border: 1px solid var(--pg-border);
+    color: var(--pg-fg-secondary); border-radius: var(--pg-radius-sm);
+    padding: 6px 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; line-height: 1; cursor: default;
+  }
+  .provider-badge {
+    font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px;
+    background: var(--pg-accent-soft); color: var(--pg-accent);
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .quick-actions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 12px 16px; border-bottom: 1px solid var(--pg-border);
+    background: var(--pg-bg-primary); flex-shrink: 0;
+  }
+  .quick-btn {
+    background: var(--pg-bg-secondary); border: 1px solid var(--pg-border);
+    color: var(--pg-fg-secondary); border-radius: 99px;
+    padding: 6px 14px; font-size: 12px; font-weight: 500;
+    cursor: default; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-family: var(--pg-font);
+  }
+  .quick-btn.active {
+    background: var(--pg-accent); color: #fff; border-color: var(--pg-accent);
+  }
+  .messages {
+    flex: 1; overflow: hidden; padding: 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    background: linear-gradient(to bottom, var(--pg-bg-primary), var(--pg-bg-secondary));
+  }
+  .msg { display: flex; flex-direction: column; max-width: 90%; }
+  .msg-user { align-self: flex-end; }
+  .msg-assistant { align-self: flex-start; width: 100%; max-width: 100%; }
+  .msg-role {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    color: var(--pg-fg-muted); margin-bottom: 4px; letter-spacing: 0.04em;
+  }
+  .msg-user .msg-role { text-align: right; margin-right: 4px; }
+  .msg-assistant .msg-role { margin-left: 4px; }
+  .msg-body {
+    padding: 10px 14px; border-radius: var(--pg-radius-md);
+    line-height: 1.6; font-size: 14px; word-wrap: break-word;
+  }
+  .msg-user .msg-body {
+    background: var(--pg-accent); color: #fff;
+    border-bottom-right-radius: 4px; box-shadow: 0 2px 4px rgba(59,130,246,0.2);
+  }
+  .msg-assistant .msg-body {
+    background: var(--pg-bg-tertiary); color: var(--pg-fg-primary);
+    border: 1px solid var(--pg-border); border-bottom-left-radius: 4px;
+  }
+  .msg-assistant .msg-body p { margin: 0 0 8px; }
+  .msg-assistant .msg-body p:last-child { margin-bottom: 0; }
+  .msg-assistant .msg-body strong { font-weight: 700; color: var(--pg-fg-primary); }
+  .msg-assistant .msg-body ul { margin: 4px 0 8px; padding-left: 20px; }
+  .msg-assistant .msg-body li { margin-bottom: 6px; }
+  .cursor-blink {
+    display: inline-block; width: 2px; height: 14px;
+    background: var(--pg-fg-secondary); margin-left: 2px; vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .composer {
+    padding: 12px 16px; background: var(--pg-bg-primary);
+    border-top: 1px solid var(--pg-border);
+    display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
+  }
+  .composer-input {
+    flex: 1; border: 1px solid var(--pg-border);
+    background: var(--pg-bg-secondary); color: var(--pg-fg-secondary);
+    border-radius: var(--pg-radius-md); padding: 10px 12px;
+    font-family: var(--pg-font); font-size: 14px;
+    min-height: 40px; line-height: 1.5; display: flex; align-items: center;
+  }
+  .composer-send {
+    height: 40px; min-width: 40px; padding: 0 16px;
+    background: var(--pg-accent); color: #fff; border: none;
+    border-radius: var(--pg-radius-md); font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pg-footer {
+    padding: 8px 16px; background: var(--pg-bg-secondary);
+    border-top: 1px solid var(--pg-border);
+    font-size: 12px; color: var(--pg-fg-muted); flex-shrink: 0;
+  }
+
+  /* ── Options page ─────────────────────────────────────────────── */
+  .options-page {
+    width: 1280px; height: 722px; background: var(--pg-bg-secondary);
+    display: flex; overflow: hidden;
+    font-family: var(--pg-font); color: var(--pg-fg-primary);
+  }
+  .options-sidebar {
+    width: 220px; background: var(--pg-bg-primary);
+    border-right: 1px solid var(--pg-border);
+    padding: 24px 0; flex-shrink: 0;
+  }
+  .options-logo {
+    padding: 0 20px 20px; border-bottom: 1px solid var(--pg-border); margin-bottom: 12px;
+    font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--pg-fg-primary);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .options-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pg-accent); }
+  .options-nav-item {
+    padding: 10px 20px; font-size: 13px; font-weight: 500;
+    color: var(--pg-fg-secondary); cursor: default; border-radius: 0;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .options-nav-item.active {
+    background: var(--pg-accent-soft); color: var(--pg-accent);
+    border-left: 3px solid var(--pg-accent); padding-left: 17px;
+  }
+  .options-content {
+    flex: 1; overflow: hidden; padding: 36px 48px;
+  }
+  .options-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .options-subtitle { font-size: 14px; color: var(--pg-fg-secondary); margin-bottom: 32px; }
+  .provider-card {
+    background: var(--pg-bg-primary); border: 1px solid var(--pg-border);
+    border-radius: var(--pg-radius-lg); padding: 20px 24px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .provider-card.selected { border-color: var(--pg-accent); box-shadow: 0 0 0 3px var(--pg-accent-soft); }
+  .provider-icon {
+    width: 40px; height: 40px; border-radius: var(--pg-radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .provider-info { flex: 1; }
+  .provider-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .provider-desc { font-size: 12px; color: var(--pg-fg-secondary); line-height: 1.4; }
+  .provider-status {
+    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px;
+    flex-shrink: 0;
+  }
+  .status-active { background: rgba(4,120,87,0.1); color: #047857; }
+  .status-ready { background: rgba(4,120,87,0.1); color: #047857; }
+  .status-byok { background: var(--pg-accent-soft); color: var(--pg-accent); }
+  .status-unavail { background: var(--pg-bg-tertiary); color: var(--pg-fg-muted); }
+  .key-input-row {
+    margin-top: 12px; display: flex; gap: 8px; align-items: center;
+  }
+  .key-input {
+    flex: 1; height: 36px; border: 1px solid var(--pg-border);
+    background: var(--pg-bg-secondary); border-radius: var(--pg-radius-sm);
+    padding: 0 12px; font-size: 13px; color: var(--pg-fg-secondary);
+    display: flex; align-items: center; font-family: monospace; letter-spacing: 0.05em;
+  }
+  .key-save-btn {
+    height: 36px; padding: 0 16px; background: var(--pg-accent); color: #fff;
+    border-radius: var(--pg-radius-sm); font-size: 13px; font-weight: 600;
+    display: flex; align-items: center;
+  }
+  .section-divider {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--pg-fg-muted);
+    margin: 28px 0 16px;
+  }
+
+  /* Privacy section callout */
+  .privacy-callout {
+    background: rgba(4,120,87,0.06); border: 1px solid rgba(4,120,87,0.2);
+    border-radius: var(--pg-radius-lg); padding: 20px 24px;
+    display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;
+  }
+  .privacy-callout-icon {
+    font-size: 24px; flex-shrink: 0; margin-top: 2px;
+  }
+  .privacy-callout-title { font-size: 14px; font-weight: 700; color: #047857; margin-bottom: 6px; }
+  .privacy-callout-body { font-size: 13px; color: var(--pg-fg-secondary); line-height: 1.6; }
+  .privacy-item {
+    background: var(--pg-bg-primary); border: 1px solid var(--pg-border);
+    border-radius: var(--pg-radius-md); padding: 14px 20px; margin-bottom: 8px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .privacy-item-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .privacy-item-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .privacy-item-desc { font-size: 12px; color: var(--pg-fg-secondary); line-height: 1.4; }
+
+  /* Token counter specific */
+  .token-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid var(--pg-border); font-size: 12px;
+  }
+  .token-row:last-child { border-bottom: none; }
+  .token-label { color: var(--pg-fg-secondary); }
+  .token-value { font-weight: 600; color: var(--pg-fg-primary); font-variant-numeric: tabular-nums; }
+  .token-cost { color: var(--pg-accent); }
+  .token-panel {
+    background: var(--pg-bg-primary); border: 1px solid var(--pg-border);
+    border-radius: var(--pg-radius-md); padding: 12px 14px; margin-top: 8px;
+  }
+
+  /* settings toggle */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0; border-bottom: 1px solid var(--pg-border);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-label { font-size: 13px; font-weight: 500; }
+  .toggle-desc { font-size: 12px; color: var(--pg-fg-secondary); margin-top: 2px; }
+  .toggle {
+    width: 40px; height: 22px; border-radius: 11px;
+    position: relative; flex-shrink: 0;
+  }
+  .toggle.on { background: var(--pg-accent); }
+  .toggle.off { background: var(--pg-bg-tertiary); border: 1px solid var(--pg-border); }
+  .toggle-thumb {
+    width: 16px; height: 16px; border-radius: 50%; background: #fff;
+    position: absolute; top: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: left 0.2s;
+  }
+  .toggle.on .toggle-thumb { left: 21px; }
+  .toggle.off .toggle-thumb { left: 3px; }
+</style>
+</head>
+<body>
+
+<div id="nav">
+  <span>PageGist CWS Screenshots — open at 1280×800, then screenshot each screen:</span>
+  <button class="active" onclick="show(1)">1 · Hero</button>
+  <button onclick="show(2)">2 · Quick Actions</button>
+  <button onclick="show(3)">3 · Settings</button>
+  <button onclick="show(4)">4 · Privacy</button>
+  <button onclick="show(5)">5 · Token Counter</button>
+  <span class="hint">Tip: use the DevTools device toolbar set to 1280×800 then ⌘+Shift+P → "Capture screenshot"</span>
+</div>
+
+<div class="screens">
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 1 — HERO: Counterarguments streaming on a long article
+═══════════════════════════════════════════════════════════════ -->
+<div class="screen active" id="s1">
+  <div class="chrome-frame">
+    <div class="chrome-tabs">
+      <div class="chrome-tab active">
+        <div class="favicon" style="background:#dc2626"></div>
+        <div class="tab-title">The Case Against AI Optimism — The Atlantic</div>
+        <div class="tab-close">✕</div>
+      </div>
+      <div class="chrome-tab-inactive">
+        <div class="favicon" style="background:#6366f1"></div>
+        <div class="tab-title">Inbox — Gmail</div>
+      </div>
+    </div>
+    <div class="chrome-toolbar">
+      <div class="chrome-nav-btn disabled">←</div>
+      <div class="chrome-nav-btn">→</div>
+      <div class="chrome-nav-btn">↻</div>
+      <div class="chrome-omnibox">
+        <span class="lock">🔒</span>
+        <span class="url">theatlantic.com/technology/archive/2025/04/ai-optimism-counterarguments</span>
+      </div>
+      <div class="chrome-extensions">
+        <div class="chrome-ext-icon">⋯</div>
+        <div class="chrome-ext-icon active" title="PageGist">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect width="16" height="16" rx="4" fill="#3b82f6"/><text x="8" y="12" text-anchor="middle" font-size="10" fill="white" font-weight="700" font-family="sans-serif">P</text></svg>
+        </div>
+      </div>
+      <div class="chrome-profile">K</div>
+    </div>
+    <div class="chrome-content-area">
+      <div class="article-pane">
+        <div class="article-scroll">
+          <div class="article-kicker">Technology · Opinion</div>
+          <div class="article-headline">The Case Against AI Optimism</div>
+          <div class="article-byline">By Sarah Chen &nbsp;·&nbsp; April 14, 2025 &nbsp;·&nbsp; 9 min read</div>
+          <div class="article-body">
+            <p>For years, technologists have promised that artificial intelligence would solve humanity's most pressing problems — from climate change to cancer to poverty. The framing has been consistent: if we just scale the models large enough, give them enough data, and trust the process, the answers will emerge.</p>
+            <p>But there is a mounting body of evidence that this optimism is not only premature — it may be actively dangerous. <strong><span class="highlight-selection">By convincing policymakers, investors, and the public that AI is on the cusp of transformative breakthroughs, technologists are displacing urgency from interventions that we know work.</span></strong></p>
+            <p>Consider the healthcare domain. AI diagnostic tools have been celebrated as the future of medicine. Yet a 2024 meta-analysis found that AI diagnostic accuracy, while impressive in controlled settings, degrades significantly in real clinical environments where data quality, patient diversity, and edge cases reign.</p>
+            <hr class="article-divider"/>
+            <p>The optimism bias runs deep in Silicon Valley culture. Failure is reframed as learning. Harm is reframed as disruption. And when critics raise concerns, they are dismissed as Luddites who simply don't understand the technology.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="pg-header">
+          <h1>The Case Against AI Optimism</h1>
+          <span class="provider-badge">Groq · Llama 3.3</span>
+          <div class="pg-header-btn">↻</div>
+          <div class="pg-header-btn">⌫</div>
+          <div class="pg-header-btn">⚙</div>
+        </div>
+        <div class="quick-actions">
+          <button class="quick-btn">Summarize</button>
+          <button class="quick-btn">Explain</button>
+          <button class="quick-btn active">Counterarguments</button>
+        </div>
+        <div class="messages">
+          <div class="msg msg-user">
+            <div class="msg-role">You</div>
+            <div class="msg-body">Counterarguments</div>
+          </div>
+          <div class="msg msg-assistant">
+            <div class="msg-role">PageGist</div>
+            <div class="msg-body">
+              <p>Here are the strongest counterarguments to the article's central claims:</p>
+              <ul>
+                <li><strong>Scale genuinely has produced breakthroughs.</strong> AlphaFold solved a 50-year protein-folding problem. AI-assisted drug discovery has accelerated candidates into clinical trials. The "we know what works" framing ignores that AI is already augmenting those known interventions.</li>
+                <li><strong>The 2024 meta-analysis cherry-picks.</strong> Deployment failures of AI diagnostics often reflect healthcare infrastructure problems — poor data pipelines, under-resourced hospitals — not fundamental model limitations. The same critique applied to EHRs for decades.</li>
+                <li><strong>Optimism has instrumental value.</strong> Attracting talent and capital to hard problems accelerates timelines even when specific claims prove overblown. The history of general-purpose technologies (electricity, internet) shows the optimists were usually right on the destination, if not the timeline.<span class="cursor-blink"></span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-input" style="color: var(--pg-fg-muted)">Ask a follow-up…</div>
+          <div class="composer-send">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 2 — QUICK ACTIONS: Highlight + action buttons prominent
+═══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="chrome-frame">
+    <div class="chrome-tabs">
+      <div class="chrome-tab active">
+        <div class="favicon" style="background:#3b82f6"></div>
+        <div class="tab-title">Quantum entanglement — Wikipedia</div>
+        <div class="tab-close">✕</div>
+      </div>
+      <div class="chrome-tab-inactive">
+        <div class="favicon" style="background:#e5e7eb"></div>
+        <div class="tab-title">New Tab</div>
+      </div>
+    </div>
+    <div class="chrome-toolbar">
+      <div class="chrome-nav-btn">←</div>
+      <div class="chrome-nav-btn disabled">→</div>
+      <div class="chrome-nav-btn">↻</div>
+      <div class="chrome-omnibox">
+        <span class="lock">🔒</span>
+        <span class="url">en.wikipedia.org/wiki/Quantum_entanglement</span>
+      </div>
+      <div class="chrome-extensions">
+        <div class="chrome-ext-icon">⋯</div>
+        <div class="chrome-ext-icon active">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect width="16" height="16" rx="4" fill="#3b82f6"/><text x="8" y="12" text-anchor="middle" font-size="10" fill="white" font-weight="700" font-family="sans-serif">P</text></svg>
+        </div>
+      </div>
+      <div class="chrome-profile">K</div>
+    </div>
+    <div class="chrome-content-area">
+      <div class="article-pane">
+        <div class="article-scroll" style="font-family: -apple-system, sans-serif;">
+          <div style="font-size:28px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em;">Quantum entanglement</div>
+          <div style="font-size:12px;color:#aaa;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:16px;">From Wikipedia, the free encyclopedia</div>
+          <div style="display:flex;gap:24px;">
+            <div style="flex:1;">
+              <p style="font-size:15px;line-height:1.7;color:#333;margin-bottom:16px;"><strong>Quantum entanglement</strong> is a phenomenon in quantum mechanics where two or more particles become correlated in such a way that the quantum state of each particle of the group cannot be described independently of the others, even when separated by a large distance.</p>
+              <p style="font-size:15px;line-height:1.7;color:#333;margin-bottom:16px;"><span class="highlight-selection">Measurements of physical properties such as position, momentum, spin, and polarization performed on entangled particles are found to be perfectly correlated.</span> For example, if a pair of entangled particles is generated such that their total spin is known to be zero, and one particle is found to have clockwise spin on a first axis, then the spin of the other particle, measured on the same axis, will be found to be counterclockwise.</p>
+              <p style="font-size:15px;line-height:1.7;color:#333;margin-bottom:16px;">Einstein, Podolsky, and Rosen argued in their 1935 paper that this phenomenon implied either that quantum mechanics was incomplete, or that faster-than-light communication was possible — what Einstein famously called "spooky action at a distance."</p>
+            </div>
+            <div style="width:200px;flex-shrink:0;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px;font-size:12px;height:fit-content;">
+              <div style="text-align:center;font-size:40px;margin-bottom:10px;">⚛️</div>
+              <div style="font-weight:700;margin-bottom:8px;font-size:13px;">Quick facts</div>
+              <div style="color:#555;line-height:1.6;">First described by Einstein, Podolsky &amp; Rosen (1935)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="pg-header">
+          <h1>Quantum entanglement</h1>
+          <span class="provider-badge">Nano · on-device</span>
+          <div class="pg-header-btn">↻</div>
+          <div class="pg-header-btn">⌫</div>
+          <div class="pg-header-btn">⚙</div>
+        </div>
+        <!-- Quick actions large + highlighted -->
+        <div style="padding:20px 16px;border-bottom:1px solid var(--pg-border);background:var(--pg-bg-primary);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--pg-fg-muted);margin-bottom:12px;">Selection detected — choose an action</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button style="background:var(--pg-bg-secondary);border:1px solid var(--pg-border);color:var(--pg-fg-primary);border-radius:var(--pg-radius-md);padding:12px 16px;font-size:13px;font-weight:600;cursor:default;text-align:left;display:flex;align-items:center;gap:12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);font-family:var(--pg-font)">
+              <span style="font-size:18px;">💡</span>
+              <span>
+                <div>Explain selection</div>
+                <div style="font-size:11px;font-weight:400;color:var(--pg-fg-secondary);margin-top:2px;">Plain-language explanation of highlighted text</div>
+              </span>
+            </button>
+            <button style="background:var(--pg-accent);border:none;color:#fff;border-radius:var(--pg-radius-md);padding:12px 16px;font-size:13px;font-weight:600;cursor:default;text-align:left;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(59,130,246,0.3);font-family:var(--pg-font)">
+              <span style="font-size:18px;">📄</span>
+              <span>
+                <div>Summarize page</div>
+                <div style="font-size:11px;font-weight:400;color:rgba(255,255,255,0.8);margin-top:2px;">High-density summary + key points</div>
+              </span>
+            </button>
+            <button style="background:var(--pg-bg-secondary);border:1px solid var(--pg-border);color:var(--pg-fg-primary);border-radius:var(--pg-radius-md);padding:12px 16px;font-size:13px;font-weight:600;cursor:default;text-align:left;display:flex;align-items:center;gap:12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);font-family:var(--pg-font)">
+              <span style="font-size:18px;">⚖️</span>
+              <span>
+                <div>Counterarguments</div>
+                <div style="font-size:11px;font-weight:400;color:var(--pg-fg-secondary);margin-top:2px;">Strongest objections to this selection</div>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="messages" style="justify-content:center;align-items:center;">
+          <div style="text-align:center;max-width:220px;">
+            <div style="font-size:32px;margin-bottom:12px;">👆</div>
+            <div style="font-size:14px;font-weight:600;color:var(--pg-fg-primary);margin-bottom:6px;">Highlight any text</div>
+            <div style="font-size:13px;color:var(--pg-fg-secondary);line-height:1.5;">Select a passage on the page, then pick an action — or type a question below.</div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-input" style="color:var(--pg-fg-muted)">Ask anything about this page…</div>
+          <div class="composer-send">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 3 — SETTINGS: Provider picker
+═══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="chrome-frame">
+    <div class="chrome-tabs">
+      <div class="chrome-tab active">
+        <div class="favicon" style="background:#3b82f6"></div>
+        <div class="tab-title">PageGist — Settings</div>
+        <div class="tab-close">✕</div>
+      </div>
+    </div>
+    <div class="chrome-toolbar">
+      <div class="chrome-nav-btn disabled">←</div>
+      <div class="chrome-nav-btn disabled">→</div>
+      <div class="chrome-nav-btn">↻</div>
+      <div class="chrome-omnibox">
+        <span class="lock">🔒</span>
+        <span class="url" style="color:#888">chrome-extension://pagegist/options.html</span>
+      </div>
+      <div class="chrome-extensions">
+        <div class="chrome-ext-icon active">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect width="16" height="16" rx="4" fill="#3b82f6"/><text x="8" y="12" text-anchor="middle" font-size="10" fill="white" font-weight="700" font-family="sans-serif">P</text></svg>
+        </div>
+      </div>
+      <div class="chrome-profile">K</div>
+    </div>
+    <div class="chrome-content-area" style="background:var(--pg-bg-secondary);">
+      <div class="options-page">
+        <div class="options-sidebar">
+          <div class="options-logo"><div class="options-logo-dot"></div>PageGist</div>
+          <div class="options-nav-item active">🤖 &nbsp;AI Provider</div>
+          <div class="options-nav-item">⚙️ &nbsp;Preferences</div>
+          <div class="options-nav-item">🔒 &nbsp;Privacy</div>
+          <div class="options-nav-item">ℹ️ &nbsp;About</div>
+        </div>
+        <div class="options-content">
+          <div class="options-title">AI Provider</div>
+          <div class="options-subtitle">Choose how PageGist powers its responses. You can switch providers at any time.</div>
+
+          <div class="provider-card selected">
+            <div class="provider-icon" style="background:#f0fdf4;">🟢</div>
+            <div class="provider-info">
+              <div class="provider-name">Chrome · Gemini Nano</div>
+              <div class="provider-desc">On-device AI. No API key, no signup, no data leaves your machine. Ideal for private browsing.</div>
+            </div>
+            <div class="provider-status status-active">✓ Active</div>
+          </div>
+
+          <div class="provider-card">
+            <div class="provider-icon" style="background:#fffbeb;">⚡</div>
+            <div class="provider-info">
+              <div class="provider-name">Groq — free tier</div>
+              <div class="provider-desc">Blazing-fast inference. Free tier covers typical personal use. Requires a free API key.</div>
+              <div class="key-input-row">
+                <div class="key-input" style="color:var(--pg-fg-muted)">gsk_ ••••••••••••••••••••••••</div>
+                <div class="key-save-btn">Save</div>
+              </div>
+            </div>
+            <div class="provider-status status-byok">BYOK</div>
+          </div>
+
+          <div class="provider-card">
+            <div class="provider-icon" style="background:#faf5ff;">🧠</div>
+            <div class="provider-info">
+              <div class="provider-name">Anthropic · Claude</div>
+              <div class="provider-desc">Claude Sonnet and Haiku. Best reasoning quality. Pay-as-you-go via your Anthropic API key.</div>
+            </div>
+            <div class="provider-status status-byok">BYOK</div>
+          </div>
+
+          <div class="provider-card">
+            <div class="provider-icon" style="background:#f0f9ff;">✦</div>
+            <div class="provider-info">
+              <div class="provider-name">OpenAI · GPT-4o</div>
+              <div class="provider-desc">GPT-4o and GPT-4o-mini. Familiar models via your OpenAI API key.</div>
+            </div>
+            <div class="provider-status status-byok">BYOK</div>
+          </div>
+
+          <div style="display:flex;gap:12px;margin-top:4px;">
+            <div class="provider-card" style="flex:1;margin-bottom:0;">
+              <div class="provider-icon" style="background:#f5f3ff;font-size:15px;">🔀</div>
+              <div class="provider-info">
+                <div class="provider-name">OpenRouter</div>
+                <div class="provider-desc">100+ models via one key.</div>
+              </div>
+              <div class="provider-status status-byok">BYOK</div>
+            </div>
+            <div class="provider-card" style="flex:1;margin-bottom:0;">
+              <div class="provider-icon" style="background:#fef2f2;font-size:15px;">🦙</div>
+              <div class="provider-info">
+                <div class="provider-name">Ollama (local)</div>
+                <div class="provider-desc">Your own models, localhost.</div>
+              </div>
+              <div class="provider-status status-ready">Local</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 4 — PRIVACY: No backend callout
+═══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s4">
+  <div class="chrome-frame">
+    <div class="chrome-tabs">
+      <div class="chrome-tab active">
+        <div class="favicon" style="background:#3b82f6"></div>
+        <div class="tab-title">PageGist — Settings</div>
+        <div class="tab-close">✕</div>
+      </div>
+    </div>
+    <div class="chrome-toolbar">
+      <div class="chrome-nav-btn disabled">←</div>
+      <div class="chrome-nav-btn disabled">→</div>
+      <div class="chrome-nav-btn">↻</div>
+      <div class="chrome-omnibox">
+        <span class="lock">🔒</span>
+        <span class="url" style="color:#888">chrome-extension://pagegist/options.html</span>
+      </div>
+      <div class="chrome-extensions">
+        <div class="chrome-ext-icon active">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect width="16" height="16" rx="4" fill="#3b82f6"/><text x="8" y="12" text-anchor="middle" font-size="10" fill="white" font-weight="700" font-family="sans-serif">P</text></svg>
+        </div>
+      </div>
+      <div class="chrome-profile">K</div>
+    </div>
+    <div class="chrome-content-area" style="background:var(--pg-bg-secondary);">
+      <div class="options-page">
+        <div class="options-sidebar">
+          <div class="options-logo"><div class="options-logo-dot"></div>PageGist</div>
+          <div class="options-nav-item">🤖 &nbsp;AI Provider</div>
+          <div class="options-nav-item">⚙️ &nbsp;Preferences</div>
+          <div class="options-nav-item active">🔒 &nbsp;Privacy</div>
+          <div class="options-nav-item">ℹ️ &nbsp;About</div>
+        </div>
+        <div class="options-content">
+          <div class="options-title">Privacy</div>
+          <div class="options-subtitle">PageGist is designed to minimise what we can see of your data — which is nothing.</div>
+
+          <div class="privacy-callout">
+            <div class="privacy-callout-icon">🛡️</div>
+            <div>
+              <div class="privacy-callout-title">No backend. No telemetry. No tracking.</div>
+              <div class="privacy-callout-body">PageGist has no server infrastructure. Your conversations, API keys, and browsing activity are never transmitted to us — because there is no "us" to send them to. Every AI call goes directly from your browser to the provider you chose.</div>
+            </div>
+          </div>
+
+          <div class="privacy-item">
+            <div class="privacy-item-icon">🔑</div>
+            <div>
+              <div class="privacy-item-title">API keys are stored locally with obfuscation</div>
+              <div class="privacy-item-desc">Keys are encoded before being written to chrome.storage.local. They are only ever sent to the provider they belong to — never to PageGist.</div>
+            </div>
+          </div>
+          <div class="privacy-item">
+            <div class="privacy-item-icon">💬</div>
+            <div>
+              <div class="privacy-item-title">Chat history stays on your machine</div>
+              <div class="privacy-item-desc">Conversations are saved in chrome.storage.local, keyed to the page URL. You can clear them at any time.</div>
+            </div>
+          </div>
+          <div class="privacy-item">
+            <div class="privacy-item-icon">📊</div>
+            <div>
+              <div class="privacy-item-title">Zero telemetry by default</div>
+              <div class="privacy-item-desc">No analytics, no crash reports, no usage events. The telemetry toggle below is off and we recommend keeping it that way.</div>
+            </div>
+          </div>
+          <div class="privacy-item">
+            <div class="privacy-item-icon">🌐</div>
+            <div>
+              <div class="privacy-item-title">Direct API calls only</div>
+              <div class="privacy-item-desc">When you ask a question, the page text and your message go from your browser to your chosen AI provider. No proxy. No logging.</div>
+            </div>
+          </div>
+
+          <div class="section-divider">Data controls</div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Clear all conversation history</div><div class="toggle-desc">Removes all per-URL chat history from this device</div></div>
+            <div style="background:var(--pg-bg-tertiary);border:1px solid var(--pg-border);color:var(--pg-fg-secondary);border-radius:var(--pg-radius-sm);padding:6px 14px;font-size:12px;font-weight:600;cursor:default;">Clear now</div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Reset all extension data</div><div class="toggle-desc">Clears keys, settings, and history — returns to onboarding</div></div>
+            <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);color:#dc2626;border-radius:var(--pg-radius-sm);padding:6px 14px;font-size:12px;font-weight:600;cursor:default;">Reset</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCREEN 5 — TOKEN COUNTER: Session cost in footer
+═══════════════════════════════════════════════════════════════ -->
+<div class="screen" id="s5">
+  <div class="chrome-frame">
+    <div class="chrome-tabs">
+      <div class="chrome-tab active">
+        <div class="favicon" style="background:#16a34a"></div>
+        <div class="tab-title">How Stripe Builds Products — Lenny's Newsletter</div>
+        <div class="tab-close">✕</div>
+      </div>
+      <div class="chrome-tab-inactive">
+        <div class="favicon" style="background:#9aa0a6"></div>
+        <div class="tab-title">Google Docs</div>
+      </div>
+    </div>
+    <div class="chrome-toolbar">
+      <div class="chrome-nav-btn">←</div>
+      <div class="chrome-nav-btn disabled">→</div>
+      <div class="chrome-nav-btn">↻</div>
+      <div class="chrome-omnibox">
+        <span class="lock">🔒</span>
+        <span class="url">substack.com/p/how-stripe-builds-products</span>
+      </div>
+      <div class="chrome-extensions">
+        <div class="chrome-ext-icon">⋯</div>
+        <div class="chrome-ext-icon active">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect width="16" height="16" rx="4" fill="#3b82f6"/><text x="8" y="12" text-anchor="middle" font-size="10" fill="white" font-weight="700" font-family="sans-serif">P</text></svg>
+        </div>
+      </div>
+      <div class="chrome-profile">K</div>
+    </div>
+    <div class="chrome-content-area">
+      <div class="article-pane">
+        <div class="article-scroll">
+          <div class="article-kicker">Product · Strategy</div>
+          <div class="article-headline">How Stripe Builds Products</div>
+          <div class="article-byline">By Lenny Rachitsky &nbsp;·&nbsp; Interview with Will Gaybrick, CPO at Stripe</div>
+          <div class="article-body">
+            <p>Stripe is one of the most admired product organisations in tech. Despite processing hundreds of billions of dollars a year, it maintains a reputation for shipping thoughtful, developer-first products at a pace that embarrasses companies a tenth its size.</p>
+            <p>In this interview, Will Gaybrick — Stripe's Chief Product Officer — explains the frameworks behind that reputation: how they decide what to build, how they structure their product teams, and why they still write six-page narratives before touching a prototype.</p>
+            <hr class="article-divider"/>
+            <p><strong>Lenny:</strong> You've talked about Stripe's culture of writing. What role do documents play in your product process?</p>
+            <p><strong>Will:</strong> Writing forces clarity. When you have to explain an idea in prose — not bullets, not a slide — you discover whether you actually understand it. We require a six-page narrative before any significant product investment. Not a deck. Not a one-pager. Six pages with context, the problem, alternatives considered, and the proposed approach.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="pg-header">
+          <h1>How Stripe Builds Products</h1>
+          <span class="provider-badge">Anthropic · Haiku</span>
+          <div class="pg-header-btn">↻</div>
+          <div class="pg-header-btn">⌫</div>
+          <div class="pg-header-btn">⚙</div>
+        </div>
+        <div class="quick-actions">
+          <button class="quick-btn">Summarize</button>
+          <button class="quick-btn">Explain</button>
+          <button class="quick-btn">Counterarguments</button>
+        </div>
+        <div class="messages" style="gap:12px;">
+          <div class="msg msg-user">
+            <div class="msg-role">You</div>
+            <div class="msg-body">Summarize</div>
+          </div>
+          <div class="msg msg-assistant">
+            <div class="msg-role">PageGist</div>
+            <div class="msg-body">
+              <p><strong>TL;DR:</strong> Stripe's CPO explains how written six-page narratives, small empowered teams, and relentless developer focus drive the company's product discipline.</p>
+              <p><strong>Key points:</strong></p>
+              <ul>
+                <li>All major product investments require a six-page written narrative — not slides — to force clarity of thinking before work begins.</li>
+                <li>Product teams at Stripe are kept intentionally small (typically 3–6 people) with full ownership over their surface area.</li>
+                <li>The "developer as customer zero" principle means internal engineers must be delighted by a product before it ships externally.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="msg msg-user">
+            <div class="msg-role">You</div>
+            <div class="msg-body">Why six pages specifically?</div>
+          </div>
+          <div class="msg msg-assistant">
+            <div class="msg-role">PageGist</div>
+            <div class="msg-body">
+              <p>The article doesn't explain the origin of "six" specifically, but Gaybrick frames it as long enough to force real depth — you can't cover context, problem, alternatives, and proposal in less — while short enough to remain readable in a sitting. It's borrowed from Amazon's narrative memo culture, adapted to Stripe's pace.</p>
+            </div>
+          </div>
+        </div>
+        <div class="composer" style="flex-direction:column;gap:0;padding:0;">
+          <div style="padding:8px 12px;display:flex;gap:8px;align-items:flex-end;border-top:1px solid var(--pg-border);">
+            <div class="composer-input" style="color:var(--pg-fg-muted)">Ask a follow-up…</div>
+            <div class="composer-send">↑</div>
+          </div>
+          <div style="padding:10px 16px;background:var(--pg-bg-secondary);border-top:1px solid var(--pg-border);">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--pg-fg-muted);margin-bottom:8px;">Session usage · claude-haiku-3-5</div>
+            <div class="token-row">
+              <span class="token-label">Input tokens</span>
+              <span class="token-value">4,821</span>
+            </div>
+            <div class="token-row">
+              <span class="token-label">Output tokens</span>
+              <span class="token-value">312</span>
+            </div>
+            <div class="token-row">
+              <span class="token-label">Page context</span>
+              <span class="token-value">4,104 tokens</span>
+            </div>
+            <div class="token-row" style="margin-top:4px;padding-top:8px;border-top:1px solid var(--pg-border);">
+              <span class="token-label" style="font-weight:600;color:var(--pg-fg-primary)">Estimated cost</span>
+              <span class="token-value token-cost">~$0.0009</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /screens -->
+
+<script>
+function show(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  document.querySelectorAll('#nav button')[n-1].classList.add('active');
+}
+</script>
+</body>
+</html>

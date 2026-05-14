@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "./Icon";
 
 export function Composer({
   pending,
@@ -62,7 +63,7 @@ export function Composer({
           aria-label="Stop generating"
           className="btn-stop"
         >
-          ■
+          <Icon name="stop" size={15} />
         </button>
       ) : (
         <button
@@ -71,7 +72,7 @@ export function Composer({
           aria-label="Send message"
           title="Send (Enter)"
         >
-          →
+          <Icon name="send" size={15} />
         </button>
       )}
     </form>

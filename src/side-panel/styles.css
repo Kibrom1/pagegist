@@ -136,6 +136,9 @@ body,
   cursor: pointer;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .quick-actions button:hover:not(:disabled) {
@@ -199,6 +202,9 @@ body,
   margin-bottom: 4px;
   margin-left: 4px;
   letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .msg-user .msg-role {

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import type { ChatMessage } from "../hooks/useChat";
+import { Icon } from "./Icon";
 
 export function MessageList({
   messages,
@@ -46,7 +47,10 @@ export function MessageList({
       {messages.map((m) => (
         <div key={m.id} className={`msg msg-${m.role}${m.error ? " msg-error" : ""}`}>
           {/* Human-readable role labels instead of API terms */}
-          <div className="msg-role">{m.role === "user" ? "You" : "PageGist"}</div>
+          <div className="msg-role">
+            <Icon name={m.role === "user" ? "user" : "sparkles"} size={11} strokeWidth={2} />
+            {m.role === "user" ? "You" : "PageGist"}
+          </div>
           <div className="msg-body">
             {m.role === "assistant" ? (
               m.content ? (
