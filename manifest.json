@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PageGist",
   "version": "0.1.0",
-  "description": "An AI reading companion that helps you understand any web page — ask questions, get summaries, and explore ideas without leaving the page.",
+  "description": "AI marginalia for the modern web. Summarize, explain, and explore any page instantly with Gemini Nano and other AI providers.",
   "minimum_chrome_version": "138",
   "permissions": [
     "sidePanel",
