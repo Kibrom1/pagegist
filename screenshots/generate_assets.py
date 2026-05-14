@@ -64,6 +64,17 @@ def generate_assets():
     draw.rounded_rectangle([550, 100, 850, 580], radius=20, fill=(255,255,255, 30))
     draw.text((40, 300), "The most powerful AI sidebar\nfor your browser.", fill="white", font=font_large)
     marquee.save('marquee_tile_generated.png')
+    
+    # 4. Large Marquee Promo Tile (1400x560) - No Alpha
+    large_marquee = create_gradient(1400, 560, blue_top, blue_bottom)
+    draw_large = ImageDraw.Draw(large_marquee)
+    draw_icon(draw_large, 60, 60, 150, blue_top)
+    draw_large.text((250, 100), "PageGist", fill="white", font=font_large)
+    draw_large.text((60, 350), "Your Intelligent AI Reading Companion\nSummarize any page instantly.", fill="white", font=font_large)
+    
+    # Ensure no alpha channel
+    large_marquee = large_marquee.convert('RGB')
+    large_marquee.save('marquee_large_generated.png')
 
 if __name__ == "__main__":
     generate_assets()
