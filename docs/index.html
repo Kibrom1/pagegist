@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagegist — Get the Gist of Any Page</title>
+  <meta name="description" content="Pagegist is a free Chrome extension that summarizes any web page in your sidebar. Stop reading everything. Start knowing everything." />
+  <meta property="og:title" content="Pagegist — Get the Gist of Any Page" />
+  <meta property="og:description" content="Free Chrome extension. Instant summaries. Works on any page." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+    :root {
+      --lime: #d9f99d;
+      --ink: #0e0e0e;
+      --white: #ffffff;
+      --sand: #f5f0e8;
+      --sky: #d4f0ff;
+      --peach: #ffd6c0;
+      --mint: #c0ffd8;
+      --lavender: #e4d4ff;
+      --muted: #6b6b6b;
+      --border: #e0ddd6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--sand);
+      color: var(--ink);
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      height: 60px;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--lime);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-right a.link {
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-right a.link:hover { color: white; }
+
+    .btn-nav {
+      background: var(--lime);
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn-nav:hover { opacity: 0.85; }
+
+    /* ─── HERO ─── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 60px);
+      max-height: 900px;
+    }
+
+    .hero-left {
+      background: var(--ink);
+      padding: 5rem 5% 4rem 6%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left::after {
+      content: '';
+      position: absolute;
+      bottom: -120px; right: -120px;
+      width: 320px; height: 320px;
+      background: var(--lime);
+      border-radius: 50%;
+      opacity: 0.08;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(200,241,53,0.12);
+      border: 1px solid rgba(200,241,53,0.3);
+      color: var(--lime);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 0.35rem 0.9rem;
+      border-radius: 100px;
+      width: fit-content;
+    }
+
+    .hero-h1 {
+      font-size: clamp(3rem, 5vw, 5rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -3px;
+      color: white;
+    }
+
+    .hero-h1 em {
+      font-style: normal;
+      color: var(--lime);
+    }
+
+    .hero-desc {
+      color: rgba(255,255,255,0.5);
+      font-size: 1rem;
+      max-width: 360px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      background: var(--lime);
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+    .btn-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(200,241,53,0.4);
+    }
+
+    .hero-meta {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+    }
+
+    /* Hero right — the live sidebar demo */
+    .hero-right {
+      background: var(--sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 4%;
+    }
+
+    .sidebar-demo {
+      width: 100%;
+      max-width: 380px;
+      background: white;
+      border-radius: 18px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.1);
+      overflow: hidden;
+      font-size: 0.88rem;
+    }
+
+    .demo-topbar {
+      background: var(--ink);
+      padding: 0.7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .demo-dots { display: flex; gap: 5px; }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .demo-dot.r { background: #ff5f57; }
+    .demo-dot.y { background: #febc2e; }
+    .demo-dot.g { background: #28c840; }
+
+    .demo-url {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .demo-body {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      min-height: 340px;
+    }
+
+    .demo-page {
+      padding: 1.2rem;
+      border-right: 1.5px solid #f0ece6;
+    }
+
+    .demo-line {
+      height: 9px;
+      background: #f0ece6;
+      border-radius: 100px;
+      margin-bottom: 9px;
+    }
+    .demo-line.w100 { width: 100%; }
+    .demo-line.w80  { width: 80%; }
+    .demo-line.w60  { width: 60%; }
+    .demo-line.w40  { width: 40%; }
+    .demo-line.hd   { height: 14px; background: #e5e0d8; width: 55%; margin-bottom: 14px; }
+
+    .demo-sidebar {
+      padding: 1rem 0.9rem;
+      background: #f9f7f4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .ds-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .ds-label .dot-lime {
+      width: 6px; height: 6px;
+      background: var(--lime);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .ds-summary {
+      background: white;
+      border: 1.5px solid #e8e3da;
+      border-radius: 8px;
+      padding: 0.7rem;
+      font-size: 0.78rem;
+      color: #444;
+      line-height: 1.55;
+    }
+
+    .ds-points { display: flex; flex-direction: column; gap: 0.4rem; }
+    .ds-point {
+      display: flex;
+      gap: 0.4rem;
+      align-items: flex-start;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .ds-bullet {
+      width: 5px; height: 5px;
+      background: #d9f99d;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.3rem;
+    }
+
+    .ds-ask {
+      margin-top: auto;
+      background: var(--ink);
+      border-radius: 7px;
+      padding: 0.55rem 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ds-ask span { font-size: 0.65rem; color: rgba(255,255,255,0.4); }
+    .ds-ask .send {
+      width: 20px; height: 20px;
+      background: var(--lime);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+    }
+
+    /* ─── TICKER ─── */
+    .ticker {
+      background: var(--lime);
+      overflow: hidden;
+      padding: 0.65rem 0;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-flex;
+      gap: 3rem;
+      animation: ticker 18s linear infinite;
+    }
+    .ticker-inner span {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ticker-inner span::before { content: '✦  '; }
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-inner { animation: none; }
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how {
+      padding: 6rem 6%;
+      background: white;
+    }
+
+    .section-eyebrow {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 3.5rem;
+    }
+
+    .steps-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      max-width: 900px;
+    }
+
+    .step-item {
+      padding: 2.5rem 2rem;
+      border-right: 1.5px solid var(--border);
+      position: relative;
+    }
+    .step-item:last-child { border-right: none; }
+
+    .step-num-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin-bottom: 1.25rem;
+    }
+    .step-item:nth-child(1) .step-num-tag { background: var(--lime); color: var(--ink); }
+    .step-item:nth-child(2) .step-num-tag { background: var(--sky); color: #1a5276; }
+    .step-item:nth-child(3) .step-num-tag { background: var(--peach); color: #7d2d0a; }
+
+    .step-item h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .step-item p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+    /* ─── FEATURES ─── */
+    .features {
+      padding: 6rem 6%;
+      background: var(--sand);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      max-width: 960px;
+    }
+
+    .feat {
+      background: white;
+      border-radius: 16px;
+      padding: 1.75rem;
+      border: 1.5px solid var(--border);
+      transition: transform 0.2s;
+    }
+    .feat:hover { transform: translateY(-4px); }
+
+    .feat-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feat h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 0.4rem; }
+    .feat p  { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+    /* ─── SOCIAL PROOF ─── */
+    .proof {
+      padding: 6rem 6%;
+      background: var(--ink);
+    }
+
+    .proof .section-eyebrow { color: rgba(255,255,255,0.35); }
+    .proof .section-title   { color: white; }
+
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      max-width: 960px;
+    }
+
+    .review-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.75rem;
+    }
+
+    .review-stars { color: #f59e0b; font-size: 0.85rem; margin-bottom: 0.85rem; letter-spacing: 2px; }
+
+    .review-card blockquote {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+      font-style: normal;
+    }
+
+    .reviewer {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .rv-avatar {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    .rv-name  { font-size: 0.85rem; font-weight: 700; color: white; }
+    .rv-role  { font-size: 0.76rem; color: rgba(255,255,255,0.35); }
+
+    /* ─── BIG CTA ─── */
+    .cta {
+      background: var(--lime);
+      padding: 7rem 6%;
+      text-align: center;
+    }
+
+    .cta h2 {
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 1.0;
+      color: var(--ink);
+      margin-bottom: 1rem;
+    }
+
+    .cta p {
+      color: rgba(0,0,0,0.5);
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--ink);
+      color: white;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 1rem 2.4rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.2);
+    }
+
+    .cta-sub {
+      margin-top: 1.25rem;
+      font-size: 0.8rem;
+      color: rgba(0,0,0,0.4);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--ink);
+      padding: 2rem 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer .logo { font-size: 1.1rem; }
+
+    footer p {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    footer p a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .footer-links a {
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: white; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; max-height: none; }
+      .hero-right { padding: 3rem 5%; }
+      .steps-list { grid-template-columns: 1fr; }
+      .step-item { border-right: none; border-bottom: 1.5px solid var(--border); }
+      .step-item:last-child { border-bottom: none; }
+      .nav-right a.link { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Pagegist</div>
+  <div class="nav-right">
+    <a href="#how-it-works" class="link">How it works</a>
+    <a href="#features" class="link">Features</a>
+    <a href="https://chromewebstore.google.com/detail/pagegist/neghcojjnblnicbmhahombnhophhopeg?hl=en-US&utm_source=ext_sidebar" target="_blank" class="btn-nav">Add to Chrome →</a>
+  </div>
+</nav>
+
+<!-- HERO — split layout -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="pill">✦ Reads any page in under 3 seconds</div>
+    <h1 class="hero-h1">Stop reading.<br /><em>Start knowing.</em></h1>
+    <p class="hero-desc">Pagegist sits in your browser sidebar and gives you the summary, key points, and Q&A for any page — in seconds.</p>
+    <div class="hero-actions">
+      <a href="https://chromewebstore.google.com/detail/pagegist/neghcojjnblnicbmhahombnhophhopeg?hl=en-US&utm_source=ext_sidebar" target="_blank" class="btn-hero">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8l4 4-4 4M8 12h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Add to Chrome — It's Free
+      </a>
+      <div class="hero-meta">Works on Chrome · Firefox · Edge</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR DEMO -->
+  <div class="hero-right">
+    <div class="sidebar-demo">
+      <div class="demo-topbar">
+        <div class="demo-dots">
+          <div class="demo-dot r"></div>
+          <div class="demo-dot y"></div>
+          <div class="demo-dot g"></div>
+        </div>
+        <div class="demo-url">techcrunch.com/2026/ai-agents-changing-work</div>
+      </div>
+      <div class="demo-body">
+        <div class="demo-page">
+          <div class="demo-line hd"></div>
+          <div class="demo-line w100"></div>
+          <div class="demo-line w80"></div>
+          <div class="demo-line w100"></div>
+          <div class="demo-line w60"></div>
+          <br/>
+          <div class="demo-line w100"></div>
+          <div class="demo-line w80"></div>
+          <div class="demo-line w100"></div>
+          <div class="demo-line w40"></div>
+        </div>
+        <div class="demo-sidebar">
+          <div class="ds-label"><span class="dot-lime"></span>Pagegist</div>
+          <div class="ds-summary">AI agents are reshaping knowledge work — from writing and research to code and analysis — with human oversight still essential.</div>
+          <div class="ds-points">
+            <div class="ds-point"><div class="ds-bullet"></div><span>Agents now handle multi-step tasks</span></div>
+            <div class="ds-point"><div class="ds-bullet"></div><span>Memory enables long-range reasoning</span></div>
+            <div class="ds-point"><div class="ds-bullet"></div><span>Human review remains critical</span></div>
+          </div>
+          <div class="ds-ask">
+            <span>Ask anything…</span>
+            <div class="send">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner">
+    <span>Instant summaries</span><span>Key point extraction</span><span>Ask the page anything</span>
+    <span>Works on any site</span><span>Free to use</span><span>No account needed</span>
+    <span>Private by design</span><span>Sidebar, not a new tab</span>
+    <!-- repeat for seamless loop -->
+    <span>Instant summaries</span><span>Key point extraction</span><span>Ask the page anything</span>
+    <span>Works on any site</span><span>Free to use</span><span>No account needed</span>
+    <span>Private by design</span><span>Sidebar, not a new tab</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how-it-works">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-title">Up and running<br />in 60 seconds.</h2>
+  <div class="steps-list">
+    <div class="step-item">
+      <div class="step-num-tag">1</div>
+      <h3>Install from Chrome Web Store</h3>
+      <p>One click to add Pagegist. No account, no email, no setup. Works immediately.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-tag">2</div>
+      <h3>Open any page</h3>
+      <p>Browse normally. When you land on something worth reading, open the sidebar.</p>
+    </div>
+    <div class="step-item">
+      <div class="step-num-tag">3</div>
+      <h3>Get the gist</h3>
+      <p>Pagegist summarizes the page, surfaces the key points, and lets you ask follow-up questions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-eyebrow">What you get</div>
+  <h2 class="section-title">Everything you need.<br />Nothing you don't.</h2>
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-icon" style="background:var(--lime)">⚡</div>
+      <h3>Instant summaries</h3>
+      <p>Get a clear summary the moment you open any page. No waiting, no copying.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:var(--sky)">🎯</div>
+      <h3>Key point extraction</h3>
+      <p>The most important ideas, pulled out so you never skim blindly again.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:var(--peach)">💬</div>
+      <h3>Chat with the page</h3>
+      <p>Ask follow-up questions. Get answers grounded in what the page actually says.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:var(--mint)">🌐</div>
+      <h3>Works anywhere</h3>
+      <p>Articles, research, docs, threads, YouTube — if it's in your browser, Pagegist handles it.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:var(--lavender)">🔒</div>
+      <h3>Private by default</h3>
+      <p>We don't store your page content. We don't sell your data. Full stop.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background:#fef9c3">🧩</div>
+      <h3>Sidebar, not a new tab</h3>
+      <p>Stays tucked away until you need it. No disruption to your workflow.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof">
+  <div class="section-eyebrow">Reviews</div>
+  <h2 class="section-title" style="margin-bottom:2.5rem">People love it.</h2>
+  <div class="cards-row">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <blockquote>"I use this every day for research. It cuts through dense articles and gives me exactly what I need in 10 seconds."</blockquote>
+      <div class="reviewer">
+        <div class="rv-avatar" style="background:rgba(200,241,53,0.15); color:var(--lime);">M</div>
+        <div>
+          <div class="rv-name">Maya R.</div>
+          <div class="rv-role">Product Designer</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <blockquote>"Finally a summarizer that doesn't butcher the meaning. The Q&A feature is brilliant for long docs."</blockquote>
+      <div class="reviewer">
+        <div class="rv-avatar" style="background:rgba(212,240,255,0.15); color:var(--sky);">J</div>
+        <div>
+          <div class="rv-name">James K.</div>
+          <div class="rv-role">Software Engineer</div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <blockquote>"Saves me at least an hour a day on news and reports. Can't browse without it anymore."</blockquote>
+      <div class="reviewer">
+        <div class="rv-avatar" style="background:rgba(255,214,192,0.15); color:var(--peach);">S</div>
+        <div>
+          <div class="rv-name">Selin A.</div>
+          <div class="rv-role">Analyst</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Get the gist.<br />Every time.</h2>
+  <p>Free forever. No account needed. Installs in one click.</p>
+  <a href="https://chromewebstore.google.com/detail/pagegist/neghcojjnblnicbmhahombnhophhopeg?hl=en-US&utm_source=ext_sidebar" target="_blank" class="btn-cta">
+    Add Pagegist to Chrome →
+  </a>
+  <p class="cta-sub">Chrome · Firefox · Edge</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Pagegist</div>
+  <p>Built by BrightSteps Digital LLC. Feedback at <a href="mailto:contact@mydetailquote.com">contact@mydetailquote.com</a></p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+</footer>
+
+</body>
+</html>
