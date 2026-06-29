@@ -9,10 +9,12 @@ const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
 const MODELS = [
   { id: "llama-3.3-70b-versatile", label: "Llama 3.3 70B (versatile)" },
+  { id: "openai/gpt-oss-120b", label: "GPT-OSS 120B" },
+  { id: "openai/gpt-oss-20b", label: "GPT-OSS 20B (fastest)" },
   { id: "llama-3.1-8b-instant", label: "Llama 3.1 8B (instant)" },
-  { id: "mixtral-8x7b-32768", label: "Mixtral 8x7B (32K)" },
-  // Gemma 2 9B omitted: its 8K context window is incompatible with the 32K
-  // page-content budget. It would silently 400 on any long article.
+  // mixtral-8x7b-32768 removed: Groq decommissioned it (deprecated 2025-03).
+  // All listed models have a 131K context window, comfortably above our 32K
+  // page-content budget. Model list last verified against Groq docs: 2026-06.
 ] as const;
 
 /**
@@ -21,8 +23,9 @@ const MODELS = [
  */
 const PRICING_PER_M_TOKENS: Record<string, { in: number; out: number }> = {
   "llama-3.3-70b-versatile": { in: 0.59, out: 0.79 },
+  "openai/gpt-oss-120b": { in: 0.15, out: 0.6 },
+  "openai/gpt-oss-20b": { in: 0.075, out: 0.3 },
   "llama-3.1-8b-instant": { in: 0.05, out: 0.08 },
-  "mixtral-8x7b-32768": { in: 0.24, out: 0.24 },
 };
 
 export function createGroqBackend(getConfig: () => Promise<ProviderConfig>): ChatBackend {

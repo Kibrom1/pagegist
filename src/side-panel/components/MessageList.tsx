@@ -1,7 +1,14 @@
 import { useEffect, useRef } from "react";
-import Markdown from "react-markdown";
+import Markdown, { type Components } from "react-markdown";
 import type { ChatMessage } from "../hooks/useChat";
 import { Icon } from "./Icon";
+
+// Open links from model output in a new tab so a click never replaces the
+// side-panel document (which would destroy the chat). noreferrer/noopener
+// strips the referrer and prevents window.opener access.
+const MARKDOWN_COMPONENTS: Components = {
+  a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noreferrer noopener" />,
+};
 
 export function MessageList({
   messages,
@@ -54,7 +61,7 @@ export function MessageList({
           <div className="msg-body">
             {m.role === "assistant" ? (
               m.content ? (
-                <Markdown>{m.content}</Markdown>
+                <Markdown components={MARKDOWN_COMPONENTS}>{m.content}</Markdown>
               ) : (
                 <span className="typing-indicator">
                   <span />

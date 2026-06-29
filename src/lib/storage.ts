@@ -48,32 +48,57 @@ async function set<T>(key: string, value: T): Promise<void> {
 
 // ---- API key obfuscation ----
 //
-// Keys are XOR'd with chrome.runtime.id (unique per install) and base64-encoded
-// before storage. Encoded values are prefixed with "xor1:" so we can detect and
-// transparently upgrade any legacy plaintext values on first read.
+// Keys are XOR'd with chrome.runtime.id and base64-encoded before storage.
+// Encoded values are prefixed with "xor1:" so we can detect and transparently
+// upgrade any legacy plaintext values on first read.
+//
+// IMPORTANT: for a *published* extension, chrome.runtime.id is a fixed, public
+// value (it appears in the Web Store URL), so the XOR key is effectively public.
+// This is OBFUSCATION, not encryption.
 //
 // Threat model: prevents API keys from being readable at a glance in DevTools →
-// Application → Extension storage. This is not cryptographic security; a
-// motivated attacker with extension access could still recover keys. For a BYOK
-// extension that makes no server-side calls, this is the appropriate level of
-// protection.
+// Application → Extension storage. It does NOT stop a motivated attacker with
+// access to the machine. For a BYOK extension that makes no server-side calls,
+// this is the appropriate level of protection.
 
-const OBFUSCATION_PREFIX = "xor1:";
+// Prefix v2: encodes value as UTF-8 bytes before XOR-ing, so the function
+// correctly handles any Unicode character (emoji, CJK, RTL scripts, etc.).
+// Old "xor1:" values are treated as legacy plaintext and re-encoded on first write.
+const OBFUSCATION_PREFIX = "xor2:";
+const LEGACY_PREFIX = "xor1:";
 
 function obfuscateKey(value: string): string {
   const seed = chrome.runtime.id;
-  const bytes = [...value].map((c, i) => c.charCodeAt(0) ^ seed.charCodeAt(i % seed.length));
-  return OBFUSCATION_PREFIX + btoa(String.fromCharCode(...bytes));
+  // Encode to UTF-8 bytes so every character maps to a well-defined byte sequence.
+  const input = new TextEncoder().encode(value);
+  const xored = input.map((b, i) => b ^ seed.charCodeAt(i % seed.length));
+  // btoa requires a binary string whose char codes are in the 0-255 range.
+  // Uint8Array guarantees that, so this is always safe.
+  return OBFUSCATION_PREFIX + btoa(String.fromCharCode(...xored));
 }
 
 function deobfuscateKey(value: string): string {
+  // Legacy plaintext (no prefix) or old xor1 format: return as-is so the
+  // caller gets the raw value; the next write will re-encode it with xor2.
   if (!value.startsWith(OBFUSCATION_PREFIX)) {
-    // Legacy plaintext — return as-is; next write will encode it.
+    if (value.startsWith(LEGACY_PREFIX)) {
+      // xor1 used charCodeAt which is equivalent to treating the string as
+      // latin-1. Reverse it the same way so users don't lose their keys.
+      const seed = chrome.runtime.id;
+      const bytes = [...atob(value.slice(LEGACY_PREFIX.length))].map((c) => c.charCodeAt(0));
+      return bytes
+        .map((b, i) => String.fromCharCode(b ^ seed.charCodeAt(i % seed.length)))
+        .join("");
+    }
     return value;
   }
   const seed = chrome.runtime.id;
-  const bytes = [...atob(value.slice(OBFUSCATION_PREFIX.length))].map((c) => c.charCodeAt(0));
-  return bytes.map((b, i) => String.fromCharCode(b ^ seed.charCodeAt(i % seed.length))).join("");
+  // Reverse: base64 → binary string → Uint8Array of XOR'd bytes → XOR again → UTF-8 decode.
+  const xored = Uint8Array.from(atob(value.slice(OBFUSCATION_PREFIX.length)), (c) =>
+    c.charCodeAt(0),
+  );
+  const original = xored.map((b, i) => b ^ seed.charCodeAt(i % seed.length));
+  return new TextDecoder().decode(original);
 }
 
 function encodeConfig(cfg: ProviderConfig): ProviderConfig {
@@ -209,5 +234,10 @@ export async function clearAllHistory(): Promise<void> {
 }
 
 export async function exportAllData(): Promise<Record<string, unknown>> {
-  return chrome.storage.local.get(null);
+  // Exclude provider configs: they hold the user's (obfuscated, recoverable)
+  // API keys. An export the user might share or back up must never leak keys.
+  const all = await chrome.storage.local.get(null);
+  return Object.fromEntries(
+    Object.entries(all).filter(([k]) => !k.startsWith("pagegist:provider-config:")),
+  );
 }

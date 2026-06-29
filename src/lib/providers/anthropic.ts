@@ -9,14 +9,14 @@ const API_VERSION = "2023-06-01";
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 const MODELS = [
-  { id: "claude-opus-4-6", label: "Claude Opus 4.6" },
+  { id: "claude-opus-4-8", label: "Claude Opus 4.8" },
   { id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
   { id: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
 ] as const;
 
 /** Approximate USD per 1M tokens, in/out. Last verified: 2026-05. */
 const PRICING_PER_M_TOKENS: Record<string, { in: number; out: number }> = {
-  "claude-opus-4-6": { in: 15, out: 75 },
+  "claude-opus-4-8": { in: 15, out: 75 },
   "claude-sonnet-4-6": { in: 3, out: 15 },
   "claude-haiku-4-5": { in: 1, out: 5 },
 };

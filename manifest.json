@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PageGist",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI marginalia for the modern web. Summarize, explain, and explore any page instantly with Gemini Nano and other AI providers.",
   "minimum_chrome_version": "138",
   "permissions": [
@@ -12,11 +12,7 @@
   ],
   "host_permissions": [
     "https://api.groq.com/*",
-    "https://api.anthropic.com/*",
-    "https://api.openai.com/*",
-    "https://generativelanguage.googleapis.com/*",
-    "https://openrouter.ai/*",
-    "http://localhost/*"
+    "https://api.anthropic.com/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.ts",
@@ -48,11 +44,5 @@
   "options_ui": {
     "page": "src/options/index.html",
     "open_in_tab": true
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["src/onboarding/index.html"],
-      "matches": ["chrome-extension://*/*"]
-    }
-  ]
+  }
 }

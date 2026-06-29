@@ -145,7 +145,7 @@ export function Options() {
   return (
     <div className="shell">
       <h1>PageGist</h1>
-      <p className="subtitle">Settings · v0.1.0</p>
+      <p className="subtitle">Settings · v0.1.1</p>
 
       <section className="section">
         <h2>Provider</h2>
